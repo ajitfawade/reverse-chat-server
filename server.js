@@ -3,28 +3,14 @@ const http = require('http');
 const socketIO = require('socket.io');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const dotenv = require('dotenv').config({ path: __dirname + '/.env' });
-const path = require('path');
-
+const dotenv = require('dotenv').config();
 // apis
-const user = './apis/user';
-const message = './apis/message';
+const user = require('./apis/user');
+const message = require('./apis/message');
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-// redirect to https on production
-app.use(function(req, res, next) {
-  let sslUrl;
-  if (
-    process.env.NODE_ENV === 'production' &&
-    req.headers['x-forwarded-proto'] !== 'https'
-  ) {
-    sslUrl = ['https://', req.hostname, req.url].join('');
-    return res.redirect(sslUrl);
-  }
-  return next();
-});
-
 // apis
 
 app.use('/apis/user', user);
@@ -33,19 +19,13 @@ app.use('/apis/message', message);
 // our server instance
 const server = http.createServer(app);
 mongoose
-  .connect(process.env.MONGO_URI, {
-    server: {
-      socketOptions: {
-        socketTimeoutMS: 0,
-        connectionTimeout: 0
-      }
-    },
-    useNewUrlParser: true
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true })
+  .then(() => {
+    console.log('Successfully connected to :', process.env.MONGO_URI);
   })
-  .then(() => console.log('Succeeded connected to: ' + process.env.MONGO_URI))
-  .catch(error =>
-    console.log('ERROR connecting to: ' + process.env.MONGO_URI + '. ' + error)
-  );
+  .catch(error => {
+    console.error('Error connecting to :', process.env.MONGO_URI, '\n', error);
+  });
 
 process.on('SIGINT', function() {
   mongoose.connection.close().then(() => process.exit(0));
@@ -56,7 +36,7 @@ const io = socketIO(server);
 app.set('socketio', socketIO);
 
 // This is what the socket.io syntax is like, we will work this later
-socketIO.on('connection', socket => {
+io.on('connection', socket => {
   console.log('User connected');
 
   socket.on('disconnect', () => {

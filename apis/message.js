@@ -7,10 +7,10 @@ const router = express.Router();
 
 router.post('/', function(req, res) {
   const message = new Message(req.body);
-  let io = req.app.get('socketio');
+  /* let io = req.app.get('socketio');
   let socket = _.find(io.sockets.sockets, function(currentSocket) {
     return currentSocket.id === req.headers.socketid;
-  });
+  }); */
   message.save(function(err, savedMessage) {
     if (err) {
       console.log(err);
@@ -20,7 +20,7 @@ router.post('/', function(req, res) {
       return;
     }
     res.json(savedMessage);
-    socket.broadcast.emit(constants.SOCKET_EVENTS.NEW_MESSAGE, savedMessage);
+    // socket.broadcast.emit(constants.SOCKET_EVENTS.NEW_MESSAGE, savedMessage);
   });
 });
 

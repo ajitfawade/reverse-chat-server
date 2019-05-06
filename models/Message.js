@@ -2,29 +2,32 @@ const mongoose = require('mongoose');
 const shortid = require('shortid');
 
 const schemaOptions = {
-    timestamps: true,
-    toJSON: {
-        virtuals: true
-    }
+  timestamps: true,
+  toJSON: {
+    virtuals: true
+  }
 };
 
-const messageSchema = new mongoose.Schema({
+const messageSchema = new mongoose.Schema(
+  {
     id: String,
     text: String,
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
-}, schemaOptions);
-
-userSchema.pre('save', function (next) {
-    const message = this;
-
-    if (!message.id) {
-        message.id = shortid.generate() + shortid.generate();
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
     }
+  },
+  schemaOptions
+);
+
+messageSchema.pre('save', function(next) {
+  const message = this;
+
+  if (!message.id) {
+    message.id = shortid.generate() + shortid.generate();
+  }
 });
 
-const Message = mongoose.model('Message', userSchema);
+const Message = mongoose.model('Message', messageSchema);
 
 module.exports = Message;
