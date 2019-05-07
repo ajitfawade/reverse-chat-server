@@ -1,39 +1,43 @@
-const mongoose = require('mongoose');
-const shortid = require('shortid');
+import mongoose from 'mongoose';
+import shortid from 'shortid';
 
 const schemaOptions = {
-    timestamps: true,
-    toJSON: {
-        virtuals: true
-    }
+  timeStamps: true,
+  toJSON: {
+    virtuals: true
+  }
 };
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+  {
     id: String,
-    firstName: {
-        type: String,
-        required: true
+    first_name: {
+      type: String,
+      required: true
     },
-    lastName: {
-        type: String,
-        required: true
+    last_name: {
+      type: String,
+      required: true
     },
     email: {
-        type: String,
-        unique: true,
-        required: true
+      type: String,
+      required: true
     },
-    picture: String
-}, schemaOptions);
+    picture: String,
+    short_name: String,
+    facebookId: String
+  },
+  schemaOptions
+);
 
-userSchema.pre('save', function (next) {
-    const user = this;
+userSchema.pre('save', function(next) {
+  const user = this;
 
-    if (!user.id) {
-        user.id = shortid.generate() + shortid.generate();
-    }
+  if (!user.id) {
+    user.id = shortid.generate() + shortid.generate();
+  }
+  next();
 });
 
 const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+export default User;

@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
-const shortid = require('shortid');
+import mongoose from 'mongoose';
+import shortid from 'shortid';
 
 const schemaOptions = {
-  timestamps: true,
+  timeStamps: true,
   toJSON: {
     virtuals: true
   }
@@ -26,8 +26,8 @@ messageSchema.pre('save', function(next) {
   if (!message.id) {
     message.id = shortid.generate() + shortid.generate();
   }
+  next();
 });
 
 const Message = mongoose.model('Message', messageSchema);
-
-module.exports = Message;
+export default Message;
